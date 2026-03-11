@@ -17,13 +17,16 @@ const Footer: React.FC = () => {
       { name: 'Portfolio Analytics', path: '/services/portfolio-analytics' },
       { name: 'Transaction Advisory', path: '/services/transaction-advisory' },
       { name: 'Tax Planning', path: '/services/tax-planning' },
-      { name: 'Mutual Funds', path: '/services/mutual-funds' },
+      { name: 'Mutual Funds', path: '/mutual-funds' },
+      { name: 'PMS', path: '/pms' },
+      { name: 'Insurance', path: '/insurance' },
     ],
     company: [
       { name: 'About Us', path: '/about' },
-      { name: 'Our Team', path: '/about#team' },
+      { name: 'Our Offerings', path: '/offerings' },
       { name: 'Fund Managers', path: '/interviews' },
       { name: 'Articles', path: '/articles' },
+      { name: 'Contact Us', path: '/contact' },
     ],
     legal: [
       { name: 'Privacy Policy', path: '/privacy' },

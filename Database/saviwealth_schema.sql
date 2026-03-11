@@ -432,13 +432,23 @@ CREATE TABLE IF NOT EXISTS settings (
 -- SAMPLE DATA INSERTION
 -- =====================================================
 
+-- Password Reset OTPs Table
+CREATE TABLE IF NOT EXISTS password_reset_otps (
+    id INT PRIMARY KEY AUTO_INCREMENT,
+    email VARCHAR(255) NOT NULL,
+    otp VARCHAR(6) NOT NULL,
+    expiresAt DATETIME NOT NULL,
+    createdAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    INDEX idx_email (email)
+);
+
 -- Insert Admin User
 INSERT INTO users (fullName, email, phone, passwordHash, role, status, kycStatus, isEmailVerified, isPhoneVerified)
 VALUES (
     'Admin User',
     'admin@saviwealth.com',
     '+91-9999999999',
-    '$2a$10$n9ibQQMULC8g7jLr6RwzaOO8P.UGJJZvnAQN5LL/uS.k1XRSzwFzG', -- password: admin123
+    '$2b$10$kT3vg7qWjGzfclOHy2idR.Mnj7LyTWQMsRVD.OqPcuLmP/4PmmmKYm',
     'admin',
     'active',
     'verified',

@@ -175,6 +175,80 @@ app.post("/api/auth/login", async (req, res) => {
   }
 })
 
+// Forgot Password - Reset with email and new password
+app.post("/api/auth/forgot-password", async (req, res) => {
+  try {
+    const { email, newPassword } = req.body
+
+    if (!email || !newPassword) {
+      return res.status(400).json({ message: "Email and new password are required", code: "MISSING_FIELDS" })
+    }
+
+    // Check if user exists
+    const [users] = await pool.execute(
+      "SELECT id FROM users WHERE email = ?",
+      [email]
+    )
+
+    if (!users.length) {
+      return res.status(404).json({ message: "User not found with this email", code: "NOT_FOUND" })
+    }
+
+    // Hash new password
+    const hash = await bcrypt.hash(newPassword, 10)
+
+    // Update user's password
+    await pool.execute(
+      "UPDATE users SET passwordHash = ? WHERE email = ?",
+      [hash, email]
+    )
+
+    res.json({ message: "Password reset successfully ✅" })
+  } catch (err) {
+    console.error("Forgot Password Error:", err)
+    res.status(500).json({ message: "Server error", code: "SERVER_ERROR" })
+  }
+})
+
+// Create Admin User (for testing - remove in production)
+app.post("/api/auth/create-admin", async (req, res) => {
+  try {
+    const { email, password, fullName } = req.body
+
+    if (!email || !password) {
+      return res.status(400).json({ message: "Email and password required", code: "MISSING_FIELDS" })
+    }
+
+    // Check if user already exists
+    const [existing] = await pool.execute(
+      "SELECT id FROM users WHERE email = ?",
+      [email]
+    )
+
+    if (existing.length > 0) {
+      // Update existing user to admin
+      const hash = await bcrypt.hash(password, 10)
+      await pool.execute(
+        "UPDATE users SET passwordHash = ?, role = 'admin', status = 'active' WHERE email = ?",
+        [hash, email]
+      )
+      return res.json({ message: "Admin user updated successfully ✅" })
+    }
+
+    // Create new admin user
+    const hash = await bcrypt.hash(password, 10)
+    await pool.execute(
+      "INSERT INTO users (fullName, email, phone, passwordHash, role, status, kycStatus, isEmailVerified, isPhoneVerified) VALUES (?, ?, ?, ?, 'admin', 'active', 'verified', TRUE, TRUE)",
+      [fullName || 'Admin', email, '+91-9999999999', hash]
+    )
+
+    res.json({ message: "Admin user created successfully ✅" })
+  } catch (err) {
+    console.error("Create Admin Error:", err)
+    res.status(500).json({ message: "Server error", code: "SERVER_ERROR" })
+  }
+})
+
 /* ========== USER PROFILE ENDPOINTS ========== */
 
 app.get("/api/user/profile", authenticateToken, async (req, res) => {

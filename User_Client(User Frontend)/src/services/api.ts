@@ -29,6 +29,14 @@ async function apiCall(endpoint: string, options: ApiOptions = {}) {
       body: body ? JSON.stringify(body) : undefined,
     });
 
+    const contentType = response.headers.get("content-type");
+    if (!contentType || !contentType.includes("application/json")) {
+      // Handle non-JSON responses
+      const text = await response.text();
+      console.error("Non-JSON response:", text);
+      throw new Error("Server error: Unable to connect to backend. Please ensure the server is running.");
+    }
+
     const data = await response.json();
 
     if (!response.ok) {
@@ -36,9 +44,12 @@ async function apiCall(endpoint: string, options: ApiOptions = {}) {
     }
 
     return data;
-  } catch (error) {
+  } catch (error: any) {
     console.error("API Error:", error);
-    throw error;
+    if (error.message.includes("Unable to connect")) {
+      throw error;
+    }
+    throw new Error(error.message || "Network error. Please check if backend is running.");
   }
 }
 
@@ -55,6 +66,13 @@ export async function login(email: string, password: string) {
   return apiCall("/api/auth/login", {
     method: "POST",
     body: { email, password },
+  });
+}
+
+export async function forgotPassword(email: string, newPassword: string) {
+  return apiCall("/api/auth/forgot-password", {
+    method: "POST",
+    body: { email, newPassword },
   });
 }
 

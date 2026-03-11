@@ -15,6 +15,9 @@ import {
   CalendarDaysIcon,
   LinkIcon,
   UserIcon,
+  ShieldCheckIcon,
+  CurrencyRupeeIcon,
+  BuildingOfficeIcon,
 } from "@heroicons/react/24/outline";
 import { useTheme } from "../contexts/ThemeContext";
 
@@ -49,6 +52,36 @@ const Navbar: React.FC = () => {
           name: "Client Services",
           path: "/client-services",
           icon: <UserIcon className="h-4 w-4" />,
+        },
+        {
+          name: "Mutual Funds",
+          path: "/mutual-funds",
+          icon: <ChartBarIcon className="h-4 w-4" />,
+        },
+        {
+          name: "PMS",
+          path: "/pms",
+          icon: <ChartBarIcon className="h-4 w-4" />,
+        },
+        {
+          name: "Insurance",
+          path: "/insurance",
+          icon: <ShieldCheckIcon className="h-4 w-4" />,
+        },
+        {
+          name: "Fixed Income",
+          path: "/fixed-income",
+          icon: <CurrencyRupeeIcon className="h-4 w-4" />,
+        },
+        {
+          name: "Capital Market",
+          path: "/capital-market",
+          icon: <ChartBarIcon className="h-4 w-4" />,
+        },
+        {
+          name: "Real Estate",
+          path: "/real-estate",
+          icon: <BuildingOfficeIcon className="h-4 w-4" />,
         },
       ],
     },

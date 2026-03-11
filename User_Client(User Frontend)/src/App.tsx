@@ -46,8 +46,11 @@ import ResourcesImportantLinks from "./pages/ResourcesImportantLinks";
 import InterviewDetail from "./pages/InterviewDetail";
 import ScheduleConsultation from "./pages/ScheduleConsultation";
 import Signup from "./pages/Signup";
-
-// Admin pages
+import ForgotPassword from "./pages/ForgotPassword";
+import Disclaimer from "./pages/Disclaimer";
+import Sitemap from "./pages/Sitemap";
+import Privacy from "./pages/Privacy";
+import Terms from "./pages/Terms";
 import { AdminMainLayout } from "./layouts/AdminMainLayout";
 import { Dashboard as AdminDashboard } from "./pages/admin/Dashboard";
 import { Users as AdminUsers } from "./pages/admin/Users";
@@ -58,19 +61,6 @@ import { Advisors as AdminAdvisors } from "./pages/admin/Advisors";
 import { Reports as AdminReports } from "./pages/admin/Reports";
 import { Notifications as AdminNotifications } from "./pages/admin/Notifications";
 import { Settings as AdminSettings } from "./pages/admin/Settings";
-
-// Placeholder components
-const Privacy: React.FC = () => (
-  <div className="min-h-screen pt-16 flex items-center justify-center bg-gray-100 dark:bg-gray-900">
-    <h1 className="text-4xl font-serif font-bold text-gray-900 dark:text-white">Privacy Policy Coming Soon</h1>
-  </div>
-);
-
-const Terms: React.FC = () => (
-  <div className="min-h-screen pt-16 flex items-center justify-center bg-gray-100 dark:bg-gray-900">
-    <h1 className="text-4xl font-serif font-bold text-gray-900 dark:text-white">Terms & Conditions Coming Soon</h1>
-  </div>
-);
 
 // ScrollToTop button
 const ScrollToTop: React.FC = () => {
@@ -146,8 +136,11 @@ function App() {
                     <Route path="/articles/:slug" element={<ArticleDetail />} />
                     <Route path="/contact" element={<Contact />} />
                     <Route path="/login" element={<Login />} />
+                    <Route path="/forgot-password" element={<ForgotPassword />} />
                     <Route path="/privacy" element={<Privacy />} />
                     <Route path="/terms" element={<Terms />} />
+                    <Route path="/disclaimer" element={<Disclaimer />} />
+                    <Route path="/sitemap" element={<Sitemap />} />
                     <Route path="/mutual-funds" element={<MutualFunds />} />
                     <Route path="/pms" element={<PMS />} />
                     <Route path="/insurance" element={<Insurance />} />
