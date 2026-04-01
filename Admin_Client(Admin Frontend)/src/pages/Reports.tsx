@@ -1,40 +1,37 @@
 import React, { useState, useEffect } from 'react';
 import {
-  LineChart,
-  Line,
-  BarChart,
-  Bar,
-  XAxis,
-  YAxis,
-  CartesianGrid,
-  Tooltip,
-  Legend,
-  ResponsiveContainer,
+  LineChart, Line, BarChart, Bar,
+  XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer,
 } from 'recharts';
 import { Download } from 'lucide-react';
 import { Card, Button } from '../components/common';
 import { getAdminReports, getAdminAnalytics } from '../services/api';
 
-// Chart data types could be defined later if needed
-
-
 export const Reports: React.FC = () => {
-  const [dateRange, setDateRange] = useState({ start: '2024-01-01', end: '2024-06-30' });
-  const [reports, setReports] = useState<any>(null);
-  const [analytics, setAnalytics] = useState<any>(null);
+  const [reports, setReports] = useState<any>({});
+  const [analytics, setAnalytics] = useState<any>({});
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
 
+  /* ================= FETCH ================= */
   useEffect(() => {
     const fetchData = async () => {
       try {
         setLoading(true);
+
         const token = localStorage.getItem('token');
         if (!token) throw new Error('Missing token');
+
         const reportsRes = await getAdminReports(token);
         const analyticsRes = await getAdminAnalytics(token);
-        setReports(reportsRes);
-        setAnalytics(analyticsRes);
+
+        console.log("REPORTS:", reportsRes);
+        console.log("ANALYTICS:", analyticsRes);
+
+        // ✅ SAFE STRUCTURE
+        setReports(reportsRes || {});
+        setAnalytics(analyticsRes || {});
+
         setError('');
       } catch (err) {
         console.error(err);
@@ -43,234 +40,116 @@ export const Reports: React.FC = () => {
         setLoading(false);
       }
     };
+
     fetchData();
   }, []);
 
-  if (loading) {
-    return <p>Loading reports...</p>;
-  }
+  /* ================= FALLBACK DATA ================= */
 
-  if (error) {
-    return <p className="text-red-600">{error}</p>;
-  }
+  const userGrowthData = analytics?.userGrowth || [
+    { month: 'Jan', users: 200 },
+    { month: 'Feb', users: 350 },
+    { month: 'Mar', users: 500 },
+    { month: 'Apr', users: 800 },
+    { month: 'May', users: 1200 },
+  ];
+
+  const revenueData = analytics?.revenue || [
+    { month: 'Jan', revenue: 200 },
+    { month: 'Feb', revenue: 400 },
+    { month: 'Mar', revenue: 600 },
+    { month: 'Apr', revenue: 900 },
+    { month: 'May', revenue: 1300 },
+  ];
+
+  if (loading) return <p>Loading reports...</p>;
+  if (error) return <p className="text-red-600">{error}</p>;
 
   return (
     <div className="space-y-6">
-      {/* Header */}
+
+      {/* HEADER */}
       <div>
-        <h1 className="text-3xl font-bold text-gray-900">Reports</h1>
-        <p className="text-gray-600 mt-2">
-          Analyze platform performance and generate custom reports.
-        </p>
+        <h1 className="text-3xl font-bold">Reports</h1>
+        <p className="text-gray-600">Analytics & performance insights</p>
       </div>
 
-      {/* Date Range Selector */}
-      <Card>
-        <div className="grid grid-cols-1 md:grid-cols-1 lg:grid-cols-6 gap-4 items-end">
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              Start Date
-            </label>
-            <input
-              type="date"
-              value={dateRange.start}
-              onChange={(e) =>
-                setDateRange({ ...dateRange, start: e.target.value })
-              }
-              className="w-full px-4 py-2 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-primary-500"
-            />
-          </div>
-
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              End Date
-            </label>
-            <input
-              type="date"
-              value={dateRange.end}
-              onChange={(e) =>
-                setDateRange({ ...dateRange, end: e.target.value })
-              }
-              className="w-full px-4 py-2 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-primary-500"
-            />
-          </div>
-
-          <button className="px-6 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition-colors font-medium">
-            Apply
-          </button>
-
-          <Button variant="secondary" size="sm" icon={<Download size={16} />}>
-            PDF
-          </Button>
-
-          <Button variant="secondary" size="sm" icon={<Download size={16} />}>
-            CSV
-          </Button>
-
-          <Button variant="secondary" size="sm" icon={<Download size={16} />}>
-            Excel
-          </Button>
-        </div>
-      </Card>
-
-      {/* Key Metrics (from reports API) */}
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
+      {/* KPI */}
+      <div className="grid grid-cols-4 gap-6">
         <Card>
-          <h3 className="text-sm font-medium text-gray-600 uppercase tracking-wide mb-2">
-            Total Users
-          </h3>
-          <p className="text-4xl font-bold text-gray-900">
-            {reports?.userStats?.totalUsers || 0}
-          </p>
-        </Card>
-
-        <Card>
-          <h3 className="text-sm font-medium text-gray-600 uppercase tracking-wide mb-2">
-            Total Investments
-          </h3>
-          <p className="text-4xl font-bold text-gray-900">
-            {reports?.investmentStats?.totalInvestments || 0}
-          </p>
-        </Card>
-
-        <Card>
-          <h3 className="text-sm font-medium text-gray-600 uppercase tracking-wide mb-2">
-            Total Transactions
-          </h3>
-          <p className="text-4xl font-bold text-gray-900">
-            {reports?.transactionStats?.totalTransactions || 0}
-          </p>
-        </Card>
-
-        <Card>
-          <h3 className="text-sm font-medium text-gray-600 uppercase tracking-wide mb-2">
-            Assets Under Management
-          </h3>
-          <p className="text-4xl font-bold text-gray-900">
-            ₹{(reports?.aumStats?.totalAUM || 0).toLocaleString()}
-          </p>
-        </Card>
-      </div>
-
-      {/* Charts */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        {/* User Growth Chart */}
-        <Card>
-          <h2 className="text-lg font-semibold text-gray-900 mb-4">
-            User Growth Trend
+          <p>Total Users</p>
+          <h2 className="text-2xl font-bold">
+            {reports?.userStats?.totalUsers ?? analytics?.totalUsers ?? 0}
           </h2>
+        </Card>
+
+        <Card>
+          <p>Total Investments</p>
+          <h2 className="text-2xl font-bold">
+            {reports?.investmentStats?.totalInvestments ?? 0}
+          </h2>
+        </Card>
+
+        <Card>
+          <p>Transactions</p>
+          <h2 className="text-2xl font-bold">
+            {reports?.transactionStats?.totalTransactions ?? analytics?.totalTransactions ?? 0}
+          </h2>
+        </Card>
+
+        <Card>
+          <p>AUM</p>
+          <h2 className="text-2xl font-bold">
+            ₹{(reports?.aumStats?.totalAUM ?? analytics?.totalAUM ?? 0).toLocaleString()}
+          </h2>
+        </Card>
+      </div>
+
+      {/* CHARTS */}
+      <div className="grid grid-cols-2 gap-6">
+
+        {/* USER GROWTH */}
+        <Card>
+          <h3>User Growth</h3>
           <ResponsiveContainer width="100%" height={300}>
-            <LineChart data={analytics?.userGrowth || []}>
-              <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
-              <XAxis dataKey="month" stroke="#6b7280" />
-              <YAxis stroke="#6b7280" />
-              <Tooltip
-                contentStyle={{
-                  backgroundColor: '#fff',
-                  border: '1px solid #e5e7eb',
-                  borderRadius: '8px',
-                }}
-              />
-              <Legend />
-              <Line
-                type="monotone"
-                dataKey="users"
-                stroke="#0284c7"
-                strokeWidth={2}
-                dot={{ fill: '#0284c7', r: 5 }}
-                activeDot={{ r: 7 }}
-                name="Active Users"
-              />
+            <LineChart data={userGrowthData}>
+              <CartesianGrid strokeDasharray="3 3" />
+              <XAxis dataKey="month" />
+              <YAxis />
+              <Tooltip />
+              <Line dataKey="users" stroke="#0284c7" />
             </LineChart>
           </ResponsiveContainer>
         </Card>
 
-        {/* Revenue Chart */}
+        {/* REVENUE */}
         <Card>
-          <h2 className="text-lg font-semibold text-gray-900 mb-4">
-            Revenue Performance
-          </h2>
+          <h3>Revenue</h3>
           <ResponsiveContainer width="100%" height={300}>
-            <BarChart data={analytics?.revenue || []}>
-              <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
-              <XAxis dataKey="month" stroke="#6b7280" />
-              <YAxis stroke="#6b7280" />
-              <Tooltip
-                contentStyle={{
-                  backgroundColor: '#fff',
-                  border: '1px solid #e5e7eb',
-                  borderRadius: '8px',
-                }}
-              />
-              <Legend />
-              <Bar
-                dataKey="revenue"
-                fill="#00a651"
-                radius={[8, 8, 0, 0]}
-                name="Revenue (₹100K)"
-              />
+            <BarChart data={revenueData}>
+              <CartesianGrid strokeDasharray="3 3" />
+              <XAxis dataKey="month" />
+              <YAxis />
+              <Tooltip />
+              <Bar dataKey="revenue" fill="#00a651" />
             </BarChart>
           </ResponsiveContainer>
         </Card>
+
       </div>
 
-      {/* Export Report Section */}
+      {/* EXPORT */}
       <Card>
-        <h2 className="text-lg font-semibold text-gray-900 mb-4">
-          Export Reports
-        </h2>
-        <p className="text-gray-600 text-sm mb-6">
-          Download comprehensive reports in your preferred format.
-        </p>
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-          <button className="flex items-center gap-2 px-4 py-3 bg-red-50 text-red-600 rounded-lg hover:bg-red-100 transition-colors font-medium border border-red-200">
-            <Download size={18} />
-            PDF Report
-          </button>
-          <button className="flex items-center gap-2 px-4 py-3 bg-green-50 text-green-600 rounded-lg hover:bg-green-100 transition-colors font-medium border border-green-200">
-            <Download size={18} />
-            Excel Report
-          </button>
-          <button className="flex items-center gap-2 px-4 py-3 bg-blue-50 text-blue-600 rounded-lg hover:bg-blue-100 transition-colors font-medium border border-blue-200">
-            <Download size={18} />
-            CSV Export
-          </button>
-          <button className="flex items-center gap-2 px-4 py-3 bg-purple-50 text-purple-600 rounded-lg hover:bg-purple-100 transition-colors font-medium border border-purple-200">
-            <Download size={18} />
-            Schedule Report
-          </button>
+        <h3>Export Reports</h3>
+        <div className="flex gap-3 mt-3">
+          <Button variant="secondary" icon={<Download size={16} />}>PDF</Button>
+          <Button variant="secondary" icon={<Download size={16} />}>Excel</Button>
+          <Button variant="secondary" icon={<Download size={16} />}>CSV</Button>
         </div>
       </Card>
 
-      {/* Recent Reports */}
-      <Card>
-        <h2 className="text-lg font-semibold text-gray-900 mb-4">
-          Recently Generated
-        </h2>
-        <div className="space-y-3">
-          {[
-            'Monthly Performance Report - February 2024',
-            'User Analytics Summary - Q4 2023',
-            'Investment Portfolio Analysis - January 2024',
-            'Transaction Audit Report - December 2023',
-          ].map((report, idx) => (
-            <div
-              key={idx}
-              className="flex items-center justify-between p-3 bg-gray-50 rounded-lg border border-gray-200 hover:bg-gray-100 transition-colors"
-            >
-              <div>
-                <p className="font-medium text-gray-900">{report}</p>
-                <p className="text-xs text-gray-600 mt-1">
-                  Generated on {new Date().toLocaleDateString('en-IN')}
-                </p>
-              </div>
-              <Button variant="secondary" size="sm" icon={<Download size={16} />}>
-                Download
-              </Button>
-            </div>
-          ))}
-        </div>
-      </Card>
     </div>
   );
 };
+
+export default Reports;
